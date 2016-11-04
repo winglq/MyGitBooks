@@ -8,3 +8,35 @@ qemu\_coroutine\_switch the from\_ Coroutine will blocked by coroutine\_lock. Th
 
 qemu\_coroutine\_delete will free the resources.
 
+coroutine\_thread is the main callable thread.
+
+
+
+=====================
+
+static void coroutine\_wait\_runnable\_locked\(CoroutineGThread \*co\)
+
+{
+
+ while \(!co-&gt;runnable\) {
+
+ g\_cond\_wait\(&coroutine\_cond, &coroutine\_lock\);
+
+ }
+
+}
+
+static void coroutine\_wait\_runnable\(CoroutineGThread \*co\)
+
+{
+
+ g\_mutex\_lock\(&coroutine\_lock\);
+
+ coroutine\_wait\_runnable\_locked\(co\);
+
+ g\_mutex\_unlock\(&coroutine\_lock\);
+
+}
+
+Coroutine will wait until conditonal could be singaled and g\_cond\_wait could unclock coroutine\_lock. After the thread go into the g\_cond\_wait, the coroutine\_lock will be unlocked, but it will need to lock the  coroutine\_lock if it want to return. So if other coroutine owned the lock g\_cond\_wait will wait.\(Perhapes\)
+
