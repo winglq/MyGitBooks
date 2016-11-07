@@ -4,7 +4,7 @@ mirror\_run: Get block length.  A in\_flight\_bitmap will be created, and the bi
 
 mirror\_iteration: if we have enough buffer, then read as many dirty pages as we can. and set these chunch dirty in the in\_flight\_bitmap. After the aio read is completed. mirror\_read\_complete will be called by aio and this function only calls bdrv\_aio\_writev which will write the in flight content to the target and set the call back as mirror\_write\_complete. After the write is completed the written part of the bit set in in\_flight\_bitmap will be cleared and the buffer will be freed.
 
-mirror\_complete: will block all disk operation.
+mirror\_complete: If the user cancel\/stop the block job, this function will be called. It will block all disk operation and set the should\_complete to true.
 
 mirror\_exit: After mirror\_run is completed, mirror\_exit will called which will swap the source and target disks. And then it will unblock all disk operations.
 
